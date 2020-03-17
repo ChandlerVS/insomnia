@@ -1,6 +1,7 @@
 // @flow
 
 import type { PluginArgumentEnumOption } from './extensions';
+import { fnOrArray } from '../common/misc';
 
 export type NunjucksParsedTagArg = {
   type:
@@ -190,7 +191,8 @@ export function getDefaultFill(name: string, args: Array<NunjucksParsedTagArg>):
   const stringArgs: Array<string> = (args || []).map(argDefinition => {
     switch (argDefinition.type) {
       case 'enum':
-        const { defaultValue, options } = argDefinition;
+        const { defaultValue } = argDefinition;
+        const options = fnOrArray(argDefinition.options, args);
         const fallback = options && options.length ? options[0].value : '';
         const value = defaultValue !== undefined ? String(defaultValue) : String(fallback);
         return `'${value}'`;

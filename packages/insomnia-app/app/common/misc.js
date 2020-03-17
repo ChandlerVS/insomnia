@@ -204,6 +204,14 @@ export function fnOrString(v: string | Function, ...args: Array<any>) {
   }
 }
 
+export function fnOrArray(v: Array<any> | Function, ...args: Array<any>) {
+  if (Array.isArray(v)) {
+    return v;
+  } else {
+    return v(...args);
+  }
+}
+
 export function compressObject(obj: any): string {
   const compressed = zlib.gzipSync(JSON.stringify(obj));
   return compressed.toString('base64');

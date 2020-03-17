@@ -9,7 +9,7 @@ import * as templateUtils from '../../../templating/utils';
 import * as db from '../../../common/database';
 import * as models from '../../../models';
 import HelpTooltip from '../help-tooltip';
-import { delay, fnOrString } from '../../../common/misc';
+import { delay, fnOrArray, fnOrString } from '../../../common/misc';
 import type { BaseModel } from '../../../models/index';
 import type { Workspace } from '../../../models/workspace';
 import type { PluginArgumentEnumOption } from '../../../templating/extensions/index';
@@ -398,11 +398,15 @@ class TagEditor extends React.PureComponent<Props, State> {
     );
   }
 
-  renderArgEnum(value: string, options: Array<PluginArgumentEnumOption>) {
+  renderArgEnum(
+    value: string,
+    args: Array<NunjucksParsedTagArg>,
+    options: Array<PluginArgumentEnumOption>,
+  ) {
     const argDatas = this.state.activeTagData ? this.state.activeTagData.args : [];
     return (
       <select value={value} onChange={this._handleChange}>
-        {options.map(option => {
+        {fnOrArray(options, args).map(option => {
           let label: string;
           const { description } = option;
           if (description) {
@@ -523,7 +527,7 @@ class TagEditor extends React.PureComponent<Props, State> {
       argInput = this.renderArgString(strValue, placeholder, encoding);
     } else if (argDefinition.type === 'enum') {
       const { options } = argDefinition;
-      argInput = this.renderArgEnum(strValue, options || []);
+      argInput = this.renderArgEnum(strValue, argDatas, options || []);
     } else if (argDefinition.type === 'file') {
       argInput = this.renderArgFile(
         strValue,

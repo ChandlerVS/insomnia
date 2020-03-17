@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 module.exports.templateTags = [
   {
     name: 'base64',
@@ -15,15 +17,25 @@ module.exports.templateTags = [
       {
         displayName: 'Kind',
         type: 'enum',
-        options: [{ displayName: 'Normal', value: 'normal' }, { displayName: 'URL', value: 'url' }],
+        options: args => [
+          { displayName: 'Normal', value: 'normal' },
+          { displayName: 'URL', value: 'url' },
+          ...(args[0].value === 'encode' ? [{ displayName: 'File', value: 'file' }] : []),
+        ],
       },
       {
         displayName: 'Value',
+        hide: args => ['file'].includes(args[1].value),
         type: 'string',
         placeholder: 'My text',
       },
+      {
+        type: 'file',
+        hide: args => ['normal', 'url'].includes(args[1].value),
+        displayName: 'File',
+      },
     ],
-    run(context, action, kind, text) {
+    run(context, action, kind, text, filePath) {
       text = text || '';
 
       if (action === 'encode') {
@@ -35,6 +47,13 @@ module.exports.templateTags = [
             .replace(/\+/g, '-')
             .replace(/\//g, '_')
             .replace(/=/g, '');
+        } else if (kind === 'file') {
+          if (filePath) {
+            let file = fs.readFileSync(filePath);
+            return Buffer.from(file).toString('base64');
+          } else {
+            return '';
+          }
         }
       } else if (action === 'decode') {
         return Buffer.from(text, 'base64').toString('utf8');

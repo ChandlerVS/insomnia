@@ -1,3 +1,4 @@
+const path = require('path');
 const tag = require('..').templateTags[0];
 
 function assertTemplate(args, expected) {
@@ -23,6 +24,13 @@ describe('Base64EncodeExtension', () => {
   it('encodes something', assertTemplate(['encode', 'normal', 'my string'], 'bXkgc3RyaW5n'));
   it('urlencodes nothing', assertTemplate(['encode', 'url', ''], ''));
   it('urlencodes something', assertTemplate(['encode', 'url', 'hello world'], 'aGVsbG8gd29ybGQ'));
+  it(
+    'fileencodes something',
+    assertTemplate(
+      ['encode', 'file', null, path.join(__dirname, 'testFile.txt')],
+      'VGhpcyBpcyBhIGZpbGUgdG8gYmFzZTY0IGVuY29kZQo=',
+    ),
+  );
   it('decodes nothing', assertTemplate(['decode', 'normal', ''], ''));
   it('decodes something', assertTemplate(['decode', 'normal', 'bXkgc3RyaW5n'], 'my string'));
   it('urldecodes nothing', assertTemplate(['decode', 'url', ''], ''));
